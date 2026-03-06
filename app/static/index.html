@@ -33,10 +33,8 @@ body{
   min-height:100vh;
 }
 
-/* --- LAYOUT --- */
 .container{max-width:720px;margin:0 auto;padding:24px 20px 60px}
 
-/* --- HEADER --- */
 header{
   text-align:center;
   padding:40px 0 32px;
@@ -54,7 +52,6 @@ header h1{
 }
 header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
 
-/* --- SECTIONS --- */
 .section{
   background:var(--bg-secondary);
   border:1px solid var(--border);
@@ -70,6 +67,75 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
   color:var(--text-muted);
   margin-bottom:16px;
 }
+
+/* --- STEPS INDICATOR --- */
+.steps{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-bottom:28px;
+}
+.step{
+  display:flex;align-items:center;gap:6px;
+  font-size:0.75rem;font-weight:600;
+  color:var(--text-muted);
+  padding:6px 14px;
+  border-radius:20px;
+  background:var(--bg-secondary);
+  border:1px solid var(--border);
+  transition:all 0.3s;
+}
+.step.active{
+  color:var(--accent-light);
+  border-color:var(--accent);
+  background:rgba(108,92,231,0.1);
+}
+.step.done{
+  color:var(--success);
+  border-color:rgba(46,213,115,0.3);
+}
+.step-num{
+  width:20px;height:20px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.65rem;
+  background:var(--border);
+  color:var(--text-muted);
+}
+.step.active .step-num{background:var(--accent);color:#fff}
+.step.done .step-num{background:var(--success);color:#fff}
+
+/* --- UPLOAD AREA --- */
+.upload-row{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.upload-btn,.reset-btn{
+  padding:10px 20px;
+  border:none;
+  border-radius:8px;
+  font-family:inherit;
+  font-size:0.85rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.upload-btn{
+  background:var(--bg-card);
+  color:var(--accent-light);
+  border:1px dashed var(--accent);
+}
+.upload-btn:hover{background:var(--accent);color:#fff;border-style:solid}
+.reset-btn{
+  background:var(--bg-card);
+  color:var(--text-secondary);
+  border:1px solid var(--border);
+}
+.reset-btn:hover{color:var(--text-primary);border-color:var(--text-secondary)}
+.upload-status{font-size:0.8rem;color:var(--text-muted)}
+#ref-file-input{display:none}
 
 /* --- AUDIO PLAYER --- */
 .player-row{
@@ -119,10 +185,7 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
   border:none;
   cursor:pointer;
 }
-.progress-bar::-webkit-slider-runnable-track{
-  height:6px;
-  border-radius:3px;
-}
+.progress-bar::-webkit-slider-runnable-track{height:6px;border-radius:3px}
 .time-display{
   font-size:0.75rem;
   color:var(--text-muted);
@@ -154,8 +217,13 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
   font-weight:600;
   transform:translateX(4px);
 }
-.lyrics-line.past{
-  color:var(--text-secondary);
+.lyrics-line.past{color:var(--text-secondary)}
+.lyrics-empty{
+  text-align:center;
+  padding:20px;
+  color:var(--text-muted);
+  font-size:0.85rem;
+  font-style:italic;
 }
 
 /* --- RECORD --- */
@@ -176,16 +244,14 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
   transition:all 0.2s;
   display:flex;align-items:center;gap:10px;
 }
-.record-btn.idle{
-  background:var(--danger);
-  color:#fff;
-}
+.record-btn.idle{background:var(--danger);color:#fff}
 .record-btn.idle:hover{background:#ff6b81}
 .record-btn.recording{
   background:var(--bg-card);
   color:var(--danger);
   border:2px solid var(--danger);
 }
+.record-btn:disabled{opacity:0.4;cursor:not-allowed}
 .record-indicator{
   display:none;
   align-items:center;
@@ -212,10 +278,7 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
 
 /* --- RESULTS --- */
 #results-section{display:none}
-.loading-state{
-  text-align:center;
-  padding:40px 0;
-}
+.loading-state{text-align:center;padding:40px 0}
 .spinner{
   width:36px;height:36px;
   border:3px solid var(--border);
@@ -254,27 +317,15 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
 .feedback-card[data-metric="timing_drift"]{border-left-color:var(--accent-light)}
 
 .feedback-header{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:10px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;
 }
 .timestamp{
-  font-size:0.75rem;
-  color:var(--text-muted);
-  font-variant-numeric:tabular-nums;
-  background:var(--bg-primary);
-  padding:2px 8px;
-  border-radius:4px;
+  font-size:0.75rem;color:var(--text-muted);font-variant-numeric:tabular-nums;
+  background:var(--bg-primary);padding:2px 8px;border-radius:4px;
 }
 .metric-badge{
-  font-size:0.7rem;
-  font-weight:600;
-  text-transform:uppercase;
-  letter-spacing:0.5px;
-  padding:3px 10px;
-  border-radius:20px;
+  font-size:0.7rem;font-weight:600;text-transform:uppercase;
+  letter-spacing:0.5px;padding:3px 10px;border-radius:20px;
 }
 .metric-badge.pitch_flat,.metric-badge.pitch_sharp{
   background:rgba(255,165,2,0.15);color:var(--warning);
@@ -285,39 +336,20 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
 .metric-badge.timing_drift{
   background:rgba(162,155,254,0.15);color:var(--accent-light);
 }
-.delta-value{
-  font-size:0.75rem;
-  color:var(--text-muted);
-  margin-left:auto;
-}
+.delta-value{font-size:0.75rem;color:var(--text-muted);margin-left:auto}
 .lyric-quote{
-  font-style:italic;
-  color:var(--text-secondary);
-  font-size:0.85rem;
-  margin-bottom:8px;
-  padding-left:12px;
-  border-left:2px solid var(--border);
+  font-style:italic;color:var(--text-secondary);font-size:0.85rem;
+  margin-bottom:8px;padding-left:12px;border-left:2px solid var(--border);
 }
-.feedback-text{
-  font-size:0.9rem;
-  color:var(--text-primary);
-  line-height:1.5;
-}
+.feedback-text{font-size:0.9rem;color:var(--text-primary);line-height:1.5}
 
 .error-card{
-  text-align:center;
-  padding:24px;
-  background:rgba(255,71,87,0.08);
-  border:1px solid rgba(255,71,87,0.2);
-  border-radius:var(--radius);
-  color:var(--danger);
+  text-align:center;padding:24px;
+  background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);
+  border-radius:var(--radius);color:var(--danger);
 }
-
 .results-summary{
-  text-align:center;
-  margin-bottom:20px;
-  padding-bottom:16px;
-  border-bottom:1px solid var(--border);
+  text-align:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);
 }
 .results-summary h3{font-size:1rem;margin-bottom:4px}
 .results-summary p{font-size:0.8rem;color:var(--text-muted)}
@@ -328,12 +360,27 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
 
   <header>
     <h1>SingCoach</h1>
-    <p>Sing along with the reference track, then get instant coaching feedback</p>
+    <p>Listen to the reference, then replicate it and get instant coaching feedback</p>
   </header>
 
-  <!-- REFERENCE PLAYER -->
+  <!-- STEP INDICATORS -->
+  <div class="steps">
+    <div class="step active" id="step-1"><span class="step-num">1</span> Listen</div>
+    <div class="step" id="step-2"><span class="step-num">2</span> Record</div>
+    <div class="step" id="step-3"><span class="step-num">3</span> Review</div>
+  </div>
+
+  <!-- REFERENCE TRACK -->
   <div class="section">
     <div class="section-label">Reference Track</div>
+
+    <div class="upload-row" style="margin-bottom:16px">
+      <button class="upload-btn" onclick="document.getElementById('ref-file-input').click()">Upload Your Own Acapella</button>
+      <button class="reset-btn" id="reset-btn" onclick="resetReference()" style="display:none">Reset to Default</button>
+      <span class="upload-status" id="upload-status"></span>
+      <input type="file" id="ref-file-input" accept="audio/*" onchange="handleRefUpload(this)">
+    </div>
+
     <div class="player-row">
       <button class="play-btn" id="play-btn" onclick="togglePlay()">
         <svg id="icon-play" viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg>
@@ -344,7 +391,9 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
         <div class="time-display"><span id="time-current">0:00</span> / <span id="time-total">0:00</span></div>
       </div>
     </div>
-    <div class="lyrics-panel" id="lyrics-panel"></div>
+    <div class="lyrics-panel" id="lyrics-panel">
+      <div class="lyrics-empty">Loading lyrics...</div>
+    </div>
   </div>
 
   <!-- RECORD SECTION -->
@@ -360,7 +409,7 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
         <span>&mdash; Recording...</span>
       </div>
       <div class="record-hint" id="record-hint">
-        Play the reference track first, then record yourself singing the same part
+        Listen to the reference track first, then try to replicate it
       </div>
     </div>
   </div>
@@ -376,45 +425,54 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
 <audio id="reference-audio" preload="auto"></audio>
 
 <script>
-// ===================== LYRICS DATA =====================
-const LYRICS = [
-  { start: 0.0,  end: 4.5,  text: "Walking down beneath the city lights" },
-  { start: 4.5,  end: 9.0,  text: "Feeling every shadow come alive" },
-  { start: 9.0,  end: 13.5, text: "The bridge above is calling out my name" },
-  { start: 13.5, end: 18.0, text: "Nothing here will ever be the same" },
-  { start: 18.0, end: 22.5, text: "I don't ever wanna feel" },
-  { start: 22.5, end: 27.0, text: "Like I did that day" },
-  { start: 27.0, end: 31.5, text: "Take me to the place I love" },
-  { start: 31.5, end: 36.0, text: "Take me all the way" },
-  { start: 36.0, end: 40.0, text: "Under the bridge downtown" },
-  { start: 40.0, end: 44.0, text: "Is where I drew some blood" },
-];
-
 // ===================== STATE =====================
+let LYRICS = [];
 const state = {
   isPlaying: false,
   isRecording: false,
+  hasListened: false,
   mediaRecorder: null,
   audioChunks: [],
   recordTimerInterval: null,
   recordStartTime: null,
 };
 
-// ===================== INIT =====================
 const audio = document.getElementById('reference-audio');
 audio.src = '/reference';
 
-// Build lyrics DOM
-const lyricsPanel = document.getElementById('lyrics-panel');
-LYRICS.forEach((line, i) => {
-  const div = document.createElement('div');
-  div.className = 'lyrics-line';
-  div.id = 'lyric-' + i;
-  div.textContent = line.text;
-  lyricsPanel.appendChild(div);
-});
+// ===================== LOAD LYRICS FROM SERVER =====================
+async function loadLyrics() {
+  try {
+    const resp = await fetch('/lyrics');
+    if (!resp.ok) throw new Error('Failed to load');
+    LYRICS = await resp.json();
+    renderLyricsPanel();
+  } catch (e) {
+    document.getElementById('lyrics-panel').innerHTML =
+      '<div class="lyrics-empty">Could not load lyrics</div>';
+  }
+}
 
-// Audio events
+function renderLyricsPanel() {
+  const panel = document.getElementById('lyrics-panel');
+  if (!LYRICS.length) {
+    panel.innerHTML = '<div class="lyrics-empty">No lyrics detected in reference track</div>';
+    return;
+  }
+  panel.innerHTML = '';
+  LYRICS.forEach((line, i) => {
+    const div = document.createElement('div');
+    div.className = 'lyrics-line';
+    div.id = 'lyric-' + i;
+    div.textContent = line.text;
+    panel.appendChild(div);
+  });
+}
+
+// Load lyrics on page load
+loadLyrics();
+
+// ===================== AUDIO EVENTS =====================
 audio.addEventListener('loadedmetadata', () => {
   document.getElementById('time-total').textContent = fmtTime(audio.duration);
 });
@@ -427,6 +485,7 @@ audio.addEventListener('timeupdate', () => {
 
   LYRICS.forEach((line, i) => {
     const el = document.getElementById('lyric-' + i);
+    if (!el) return;
     if (t >= line.start && t < line.end) {
       el.className = 'lyrics-line active';
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -440,8 +499,20 @@ audio.addEventListener('timeupdate', () => {
 
 audio.addEventListener('ended', () => {
   state.isPlaying = false;
+  state.hasListened = true;
   updatePlayIcon();
+  setStep(2);
 });
+
+// ===================== STEP MANAGEMENT =====================
+function setStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('step-' + i);
+    el.classList.remove('active', 'done');
+    if (i < n) el.classList.add('done');
+    else if (i === n) el.classList.add('active');
+  }
+}
 
 // ===================== PLAYER CONTROLS =====================
 function togglePlay() {
@@ -449,6 +520,7 @@ function togglePlay() {
     audio.pause();
   } else {
     audio.play();
+    setStep(1);
   }
   state.isPlaying = !state.isPlaying;
   updatePlayIcon();
@@ -460,9 +532,7 @@ function updatePlayIcon() {
 }
 
 function seekAudio(val) {
-  if (audio.duration) {
-    audio.currentTime = (val / 100) * audio.duration;
-  }
+  if (audio.duration) audio.currentTime = (val / 100) * audio.duration;
 }
 
 function fmtTime(s) {
@@ -470,6 +540,73 @@ function fmtTime(s) {
   const m = Math.floor(s / 60);
   const sec = Math.floor(s % 60);
   return m + ':' + String(sec).padStart(2, '0');
+}
+
+// ===================== REFERENCE UPLOAD =====================
+async function handleRefUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const status = document.getElementById('upload-status');
+  status.textContent = 'Uploading & transcribing...';
+
+  const formData = new FormData();
+  formData.append('reference_audio', file);
+
+  try {
+    const resp = await fetch('/upload-reference', { method: 'POST', body: formData });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new Error(err.detail);
+    }
+    const data = await resp.json();
+
+    // Update lyrics from server response
+    LYRICS = data.lyrics || [];
+    renderLyricsPanel();
+
+    // Reload audio element
+    audio.src = '/reference?t=' + Date.now();
+    audio.load();
+    state.hasListened = false;
+    setStep(1);
+
+    status.textContent = data.message || 'Reference updated';
+    document.getElementById('reset-btn').style.display = 'inline-block';
+
+    // Hide results from previous analysis
+    document.getElementById('results-section').style.display = 'none';
+
+  } catch (err) {
+    status.textContent = 'Error: ' + err.message;
+  }
+
+  input.value = '';
+}
+
+async function resetReference() {
+  const status = document.getElementById('upload-status');
+  status.textContent = 'Resetting...';
+
+  try {
+    const resp = await fetch('/reset-reference', { method: 'POST' });
+    const data = await resp.json();
+
+    LYRICS = data.lyrics || [];
+    renderLyricsPanel();
+
+    audio.src = '/reference?t=' + Date.now();
+    audio.load();
+    state.hasListened = false;
+    setStep(1);
+
+    status.textContent = 'Reset to default track';
+    document.getElementById('reset-btn').style.display = 'none';
+    document.getElementById('results-section').style.display = 'none';
+
+  } catch (err) {
+    status.textContent = 'Error resetting';
+  }
 }
 
 // ===================== RECORDING =====================
@@ -482,18 +619,20 @@ async function toggleRecord() {
 }
 
 async function startRecording() {
+  // Pause reference if playing
+  if (state.isPlaying) {
+    audio.pause();
+    state.isPlaying = false;
+    updatePlayIcon();
+  }
+
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        sampleRate: 44100,
-      }
+      audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 44100 }
     });
 
     const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-      ? 'audio/webm;codecs=opus'
-      : 'audio/webm';
+      ? 'audio/webm;codecs=opus' : 'audio/webm';
 
     state.mediaRecorder = new MediaRecorder(stream, { mimeType });
     state.audioChunks = [];
@@ -511,15 +650,14 @@ async function startRecording() {
     state.mediaRecorder.start(100);
     state.isRecording = true;
     state.recordStartTime = Date.now();
+    setStep(2);
 
-    // Update UI
     const btn = document.getElementById('record-btn');
     btn.className = 'record-btn recording';
     document.getElementById('record-btn-text').textContent = 'Stop Recording';
     document.getElementById('record-indicator').classList.add('visible');
     document.getElementById('record-hint').style.display = 'none';
 
-    // Timer
     state.recordTimerInterval = setInterval(() => {
       const elapsed = (Date.now() - state.recordStartTime) / 1000;
       document.getElementById('record-timer').textContent = fmtTime(elapsed);
@@ -534,7 +672,6 @@ function stopRecording() {
   if (state.mediaRecorder && state.isRecording) {
     state.mediaRecorder.stop();
     state.isRecording = false;
-
     clearInterval(state.recordTimerInterval);
 
     const btn = document.getElementById('record-btn');
@@ -545,18 +682,16 @@ function stopRecording() {
   }
 }
 
-// ===================== ANALYSIS SUBMISSION =====================
+// ===================== ANALYSIS =====================
 async function submitForAnalysis(blob) {
   showLoading();
+  setStep(3);
 
   const formData = new FormData();
   formData.append('user_audio', blob, 'recording.webm');
 
   try {
-    const response = await fetch('/analyze', {
-      method: 'POST',
-      body: formData,
-    });
+    const response = await fetch('/analyze', { method: 'POST', body: formData });
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({ detail: 'Server error' }));
@@ -573,7 +708,7 @@ async function submitForAnalysis(blob) {
   }
 }
 
-// ===================== RESULTS RENDERING =====================
+// ===================== RESULTS =====================
 function showLoading() {
   const section = document.getElementById('results-section');
   section.style.display = 'block';
@@ -601,31 +736,32 @@ function renderFeedback(items) {
   items.sort((a, b) => a.timestamp_start - b.timestamp_start);
 
   const metricLabels = {
-    pitch_flat: 'Pitch (Flat)',
-    pitch_sharp: 'Pitch (Sharp)',
-    energy_drop: 'Breath Support',
-    energy_low: 'Volume',
-    timing_drift: 'Timing',
+    pitch_flat: 'Pitch (Flat)', pitch_sharp: 'Pitch (Sharp)',
+    energy_drop: 'Breath Support', energy_low: 'Volume', timing_drift: 'Timing',
   };
 
-  let summaryHtml = `
+  let html = `
     <div class="results-summary">
       <h3>${items.length} coaching note${items.length !== 1 ? 's' : ''}</h3>
       <p>Review each item below for specific guidance</p>
     </div>`;
 
-  let cardsHtml = items.map(item => `
+  html += items.map(item => {
+    const lyricHtml = item.lyric_snippet
+      ? `<div class="lyric-quote">&ldquo;${item.lyric_snippet}&rdquo;</div>` : '';
+    return `
     <div class="feedback-card" data-metric="${item.metric}">
       <div class="feedback-header">
         <span class="timestamp">${fmtTime(item.timestamp_start)} &ndash; ${fmtTime(item.timestamp_end)}</span>
         <span class="metric-badge ${item.metric}">${metricLabels[item.metric] || item.metric}</span>
         <span class="delta-value">${item.delta}</span>
       </div>
-      <div class="lyric-quote">&ldquo;${item.lyric_snippet}&rdquo;</div>
+      ${lyricHtml}
       <div class="feedback-text">${item.feedback}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
-  container.innerHTML = summaryHtml + cardsHtml;
+  container.innerHTML = html;
 }
 
 function showError(message) {
@@ -642,7 +778,7 @@ function resetRecordButton() {
   btn.className = 'record-btn idle';
   document.getElementById('record-btn-text').textContent = 'Record Again';
   document.getElementById('record-hint').style.display = 'block';
-  document.getElementById('record-hint').textContent = 'Try again to improve your score';
+  document.getElementById('record-hint').textContent = 'Try again to improve your performance';
 }
 </script>
 </body>

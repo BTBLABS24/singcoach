@@ -3,24 +3,8 @@ Rule-based coaching engine. Deterministic rules applied to per-window
 analysis results — no LLM needed.
 """
 
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 from app.analyzer import SegmentAnalysis
-
-
-# Hardcoded lyrics with timestamps matching the ~44s reference audio.
-# Placeholder lyrics (not actual copyrighted lyrics).
-LYRICS = [
-    (0.0,   4.5,  "Walking down beneath the city lights"),
-    (4.5,   9.0,  "Feeling every shadow come alive"),
-    (9.0,  13.5,  "The bridge above is calling out my name"),
-    (13.5, 18.0,  "Nothing here will ever be the same"),
-    (18.0, 22.5,  "I don't ever wanna feel"),
-    (22.5, 27.0,  "Like I did that day"),
-    (27.0, 31.5,  "Take me to the place I love"),
-    (31.5, 36.0,  "Take me all the way"),
-    (36.0, 40.0,  "Under the bridge downtown"),
-    (40.0, 44.0,  "Is where I drew some blood"),
-]
 
 
 class CoachingEngine:
@@ -38,7 +22,15 @@ class CoachingEngine:
     TIMING_THRESHOLD_MS = 100.0
     ENERGY_RATIO_LOW = 0.5
 
-    def generate_feedback(self, segments: List[SegmentAnalysis]) -> List[Dict[str, Any]]:
+    def generate_feedback(
+        self,
+        segments: List[SegmentAnalysis],
+        lyrics: List[Tuple[float, float, str]] | None = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Process segments and return feedback items.
+        lyrics: optional list of (start_sec, end_sec, text) from Whisper.
+        """
         feedback_items = []
 
         for seg in segments:
@@ -46,7 +38,9 @@ class CoachingEngine:
             if not issues:
                 continue
 
-            lyric = self._find_lyric(seg.ref_time_start, seg.ref_time_end)
+            lyric = ""
+            if lyrics:
+                lyric = self._find_lyric(seg.ref_time_start, seg.ref_time_end, lyrics)
 
             for issue in issues:
                 feedback_items.append({
@@ -123,12 +117,19 @@ class CoachingEngine:
 
         return issues
 
-    def _find_lyric(self, t_start: float, t_end: float) -> str:
+    def _find_lyric(
+        self,
+        t_start: float,
+        t_end: float,
+        lyrics: List[Tuple[float, float, str]],
+    ) -> str:
         midpoint = (t_start + t_end) / 2.0
 
-        for lyric_start, lyric_end, text in LYRICS:
+        for lyric_start, lyric_end, text in lyrics:
             if lyric_start <= midpoint < lyric_end:
                 return text
 
-        closest = min(LYRICS, key=lambda l: abs((l[0] + l[1]) / 2 - midpoint))
-        return closest[2]
+        if lyrics:
+            closest = min(lyrics, key=lambda l: abs((l[0] + l[1]) / 2 - midpoint))
+            return closest[2]
+        return ""

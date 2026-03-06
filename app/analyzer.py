@@ -8,6 +8,9 @@ import librosa
 from dtw import dtw
 from dataclasses import dataclass
 from typing import List, Optional
+import logging
+
+logger = logging.getLogger("singcoach.analyzer")
 
 
 @dataclass
@@ -36,7 +39,7 @@ class AudioAnalyzer:
     Pipeline:
     1. Load both audio files (mono, 16kHz)
     2. Extract features: pitch (YIN), energy (RMS), onsets, chroma (CQT)
-    3. DTW-align using chroma features
+    3. DTW-align using MFCC features
     4. Segment into 500ms windows using the DTW warping path
     5. Compute per-window deltas for pitch, energy, and timing
     """
@@ -78,28 +81,44 @@ class AudioAnalyzer:
             y=y, sr=self.sr, hop_length=self.hop_length
         )
 
-    def _extract_chroma(self, y: np.ndarray) -> np.ndarray:
-        chroma = librosa.feature.chroma_cqt(
-            y=y, sr=self.sr, hop_length=self.hop_length
+    def _extract_mfcc(self, y: np.ndarray) -> np.ndarray:
+        mfcc = librosa.feature.mfcc(
+            y=y, sr=self.sr, n_mfcc=13, hop_length=self.hop_length
         )
-        return chroma.T  # (T, 12)
+        return mfcc.T  # (T, 13)
 
     def _align_dtw(
         self,
-        ref_chroma: np.ndarray,
-        user_chroma: np.ndarray,
+        ref_features: np.ndarray,
+        user_features: np.ndarray,
     ) -> tuple:
-        window_size = max(len(ref_chroma) // 4, len(user_chroma) // 4, 50)
-
-        alignment = dtw(
-            user_chroma,
-            ref_chroma,
-            dist_method="cosine",
-            step_pattern="symmetric2",
-            window_type="sakoechiba",
-            window_args={"window_size": window_size},
-            keep_internals=False,
-        )
+        """
+        DTW alignment using MFCC features with no windowing constraint.
+        Falls back to unconstrained if Sakoe-Chiba fails (recordings
+        may differ significantly in length).
+        """
+        try:
+            # Try with a generous Sakoe-Chiba window first
+            window_size = max(len(ref_features), len(user_features))
+            alignment = dtw(
+                user_features,
+                ref_features,
+                dist_method="euclidean",
+                step_pattern="symmetric2",
+                window_type="sakoechiba",
+                window_args={"window_size": window_size},
+                keep_internals=False,
+            )
+        except Exception:
+            # If that fails, run fully unconstrained
+            logger.info("Sakoe-Chiba DTW failed, falling back to unconstrained")
+            alignment = dtw(
+                user_features,
+                ref_features,
+                dist_method="euclidean",
+                step_pattern="symmetric2",
+                keep_internals=False,
+            )
 
         # index1 = query (user), index2 = reference
         return np.array(alignment.index2), np.array(alignment.index1)
@@ -112,8 +131,6 @@ class AudioAnalyzer:
         user_pitch: np.ndarray,
         ref_energy: np.ndarray,
         user_energy: np.ndarray,
-        ref_onsets: np.ndarray,
-        user_onsets: np.ndarray,
     ) -> List[SegmentAnalysis]:
         n_ref_frames = int(np.max(ref_indices)) + 1
         n_user_total = int(np.max(user_indices)) + 1
@@ -214,25 +231,20 @@ class AudioAnalyzer:
         ref_energy = self._extract_energy(ref_y)
         user_energy = self._extract_energy(user_y)
 
-        ref_onsets = self._extract_onsets(ref_y)
-        user_onsets = self._extract_onsets(user_y)
+        ref_mfcc = self._extract_mfcc(ref_y)
+        user_mfcc = self._extract_mfcc(user_y)
 
-        ref_chroma = self._extract_chroma(ref_y)
-        user_chroma = self._extract_chroma(user_y)
-
-        ref_idx, user_idx = self._align_dtw(ref_chroma, user_chroma)
+        ref_idx, user_idx = self._align_dtw(ref_mfcc, user_mfcc)
 
         # Equalize feature array lengths per recording
-        ref_len = min(len(ref_pitch), len(ref_energy), len(ref_onsets), len(ref_chroma))
-        user_len = min(len(user_pitch), len(user_energy), len(user_onsets), len(user_chroma))
+        ref_len = min(len(ref_pitch), len(ref_energy), len(ref_mfcc))
+        user_len = min(len(user_pitch), len(user_energy), len(user_mfcc))
 
         ref_pitch = ref_pitch[:ref_len]
         ref_energy = ref_energy[:ref_len]
-        ref_onsets = ref_onsets[:ref_len]
 
         user_pitch = user_pitch[:user_len]
         user_energy = user_energy[:user_len]
-        user_onsets = user_onsets[:user_len]
 
         ref_idx = np.clip(ref_idx, 0, ref_len - 1)
         user_idx = np.clip(user_idx, 0, user_len - 1)
@@ -241,5 +253,4 @@ class AudioAnalyzer:
             ref_idx, user_idx,
             ref_pitch, user_pitch,
             ref_energy, user_energy,
-            ref_onsets, user_onsets,
         )

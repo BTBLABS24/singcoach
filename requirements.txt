@@ -5,3 +5,4 @@ numpy==1.26.4
 dtw-python==1.5.3
 python-multipart==0.0.18
 soundfile==0.12.1
+openai-whisper==20240930
