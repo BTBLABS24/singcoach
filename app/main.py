@@ -7,11 +7,10 @@ Supports dynamic Whisper transcription and custom reference uploads.
 import os
 import tempfile
 import logging
-import shutil
 from pathlib import Path
 from typing import List, Tuple
 
-import whisper
+from faster_whisper import WhisperModel
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -38,20 +37,20 @@ app = FastAPI(title="SingCoach", version="0.2.0")
 analyzer = AudioAnalyzer(sr=16000, hop_length=512, window_sec=0.5)
 coach = CoachingEngine()
 
-# Load Whisper model (base is a good speed/accuracy trade-off for MVP)
-logger.info("Loading Whisper model...")
-whisper_model = whisper.load_model("base")
-logger.info("Whisper model loaded.")
+# Load faster-whisper model (base, int8 on CPU for lightweight deployment)
+logger.info("Loading faster-whisper model...")
+whisper_model = WhisperModel("base", device="cpu", compute_type="int8")
+logger.info("faster-whisper model loaded.")
 
 
 def transcribe_audio(audio_path: str) -> List[Tuple[float, float, str]]:
-    """Transcribe audio file using Whisper, return list of (start, end, text)."""
-    result = whisper_model.transcribe(audio_path, word_timestamps=False)
+    """Transcribe audio file using faster-whisper, return list of (start, end, text)."""
+    segments, _info = whisper_model.transcribe(audio_path)
     lyrics = []
-    for seg in result.get("segments", []):
-        text = seg["text"].strip()
+    for seg in segments:
+        text = seg.text.strip()
         if text:
-            lyrics.append((seg["start"], seg["end"], text))
+            lyrics.append((seg.start, seg.end, text))
     return lyrics
 
 
