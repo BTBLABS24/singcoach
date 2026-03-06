@@ -1,0 +1,7 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+librosa==0.10.2
+numpy==1.26.4
+dtw-python==1.5.3
+python-multipart==0.0.18
+soundfile==0.12.1

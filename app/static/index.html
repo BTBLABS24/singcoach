@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SingCoach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-primary:#0f0f13;
+  --bg-secondary:#1a1a24;
+  --bg-card:#22223a;
+  --bg-card-hover:#2a2a48;
+  --text-primary:#e8e8f0;
+  --text-secondary:#9999bb;
+  --text-muted:#66668a;
+  --accent:#6c5ce7;
+  --accent-light:#a29bfe;
+  --danger:#ff4757;
+  --success:#2ed573;
+  --warning:#ffa502;
+  --border:#2d2d44;
+  --radius:10px;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg-primary);
+  color:var(--text-primary);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  line-height:1.6;
+  min-height:100vh;
+}
+
+/* --- LAYOUT --- */
+.container{max-width:720px;margin:0 auto;padding:24px 20px 60px}
+
+/* --- HEADER --- */
+header{
+  text-align:center;
+  padding:40px 0 32px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:32px;
+}
+header h1{
+  font-size:2rem;
+  font-weight:700;
+  background:linear-gradient(135deg,var(--accent-light),var(--accent));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  letter-spacing:-0.5px;
+}
+header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
+
+/* --- SECTIONS --- */
+.section{
+  background:var(--bg-secondary);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:24px;
+  margin-bottom:24px;
+}
+.section-label{
+  font-size:0.7rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  color:var(--text-muted);
+  margin-bottom:16px;
+}
+
+/* --- AUDIO PLAYER --- */
+.player-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.play-btn{
+  width:48px;height:48px;
+  border-radius:50%;
+  border:none;
+  background:var(--accent);
+  color:#fff;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  transition:background 0.2s,transform 0.1s;
+}
+.play-btn:hover{background:var(--accent-light)}
+.play-btn:active{transform:scale(0.95)}
+.play-btn svg{width:20px;height:20px;fill:currentColor}
+.progress-wrap{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.progress-bar{
+  width:100%;height:6px;
+  -webkit-appearance:none;appearance:none;
+  background:var(--border);
+  border-radius:3px;
+  cursor:pointer;
+  outline:none;
+}
+.progress-bar::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:14px;height:14px;
+  border-radius:50%;
+  background:var(--accent-light);
+  cursor:pointer;
+}
+.progress-bar::-moz-range-thumb{
+  width:14px;height:14px;
+  border-radius:50%;
+  background:var(--accent-light);
+  border:none;
+  cursor:pointer;
+}
+.progress-bar::-webkit-slider-runnable-track{
+  height:6px;
+  border-radius:3px;
+}
+.time-display{
+  font-size:0.75rem;
+  color:var(--text-muted);
+  font-variant-numeric:tabular-nums;
+}
+
+/* --- LYRICS --- */
+.lyrics-panel{
+  margin-top:20px;
+  max-height:260px;
+  overflow-y:auto;
+  padding:4px 0;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border) transparent;
+}
+.lyrics-panel::-webkit-scrollbar{width:4px}
+.lyrics-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.lyrics-line{
+  padding:10px 16px;
+  border-radius:8px;
+  font-size:0.95rem;
+  color:var(--text-muted);
+  transition:all 0.3s ease;
+  cursor:default;
+}
+.lyrics-line.active{
+  background:rgba(108,92,231,0.12);
+  color:var(--text-primary);
+  font-weight:600;
+  transform:translateX(4px);
+}
+.lyrics-line.past{
+  color:var(--text-secondary);
+}
+
+/* --- RECORD --- */
+.record-area{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+}
+.record-btn{
+  padding:14px 36px;
+  border:none;
+  border-radius:50px;
+  font-family:inherit;
+  font-size:0.95rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;align-items:center;gap:10px;
+}
+.record-btn.idle{
+  background:var(--danger);
+  color:#fff;
+}
+.record-btn.idle:hover{background:#ff6b81}
+.record-btn.recording{
+  background:var(--bg-card);
+  color:var(--danger);
+  border:2px solid var(--danger);
+}
+.record-indicator{
+  display:none;
+  align-items:center;
+  gap:8px;
+  font-size:0.85rem;
+  color:var(--danger);
+}
+.record-indicator.visible{display:flex}
+.red-dot{
+  width:10px;height:10px;
+  background:var(--danger);
+  border-radius:50%;
+  animation:pulse-red 1s infinite;
+}
+@keyframes pulse-red{
+  0%,100%{opacity:1}
+  50%{opacity:0.3}
+}
+.record-hint{
+  font-size:0.8rem;
+  color:var(--text-muted);
+  text-align:center;
+}
+
+/* --- RESULTS --- */
+#results-section{display:none}
+.loading-state{
+  text-align:center;
+  padding:40px 0;
+}
+.spinner{
+  width:36px;height:36px;
+  border:3px solid var(--border);
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+  margin:0 auto 16px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-state p{color:var(--text-secondary);font-size:0.9rem}
+.loading-state .detail{color:var(--text-muted);font-size:0.8rem;margin-top:4px}
+
+.success-card{
+  text-align:center;
+  padding:32px 20px;
+  background:rgba(46,213,115,0.08);
+  border:1px solid rgba(46,213,115,0.2);
+  border-radius:var(--radius);
+}
+.success-card h3{color:var(--success);font-size:1.1rem;margin-bottom:8px}
+.success-card p{color:var(--text-secondary);font-size:0.9rem}
+
+.feedback-card{
+  background:var(--bg-card);
+  border-left:4px solid var(--accent);
+  border-radius:var(--radius);
+  padding:18px 20px;
+  margin-bottom:14px;
+  transition:background 0.2s;
+}
+.feedback-card:hover{background:var(--bg-card-hover)}
+.feedback-card[data-metric="pitch_flat"],
+.feedback-card[data-metric="pitch_sharp"]{border-left-color:var(--warning)}
+.feedback-card[data-metric="energy_drop"],
+.feedback-card[data-metric="energy_low"]{border-left-color:var(--danger)}
+.feedback-card[data-metric="timing_drift"]{border-left-color:var(--accent-light)}
+
+.feedback-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+.timestamp{
+  font-size:0.75rem;
+  color:var(--text-muted);
+  font-variant-numeric:tabular-nums;
+  background:var(--bg-primary);
+  padding:2px 8px;
+  border-radius:4px;
+}
+.metric-badge{
+  font-size:0.7rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  padding:3px 10px;
+  border-radius:20px;
+}
+.metric-badge.pitch_flat,.metric-badge.pitch_sharp{
+  background:rgba(255,165,2,0.15);color:var(--warning);
+}
+.metric-badge.energy_drop,.metric-badge.energy_low{
+  background:rgba(255,71,87,0.15);color:var(--danger);
+}
+.metric-badge.timing_drift{
+  background:rgba(162,155,254,0.15);color:var(--accent-light);
+}
+.delta-value{
+  font-size:0.75rem;
+  color:var(--text-muted);
+  margin-left:auto;
+}
+.lyric-quote{
+  font-style:italic;
+  color:var(--text-secondary);
+  font-size:0.85rem;
+  margin-bottom:8px;
+  padding-left:12px;
+  border-left:2px solid var(--border);
+}
+.feedback-text{
+  font-size:0.9rem;
+  color:var(--text-primary);
+  line-height:1.5;
+}
+
+.error-card{
+  text-align:center;
+  padding:24px;
+  background:rgba(255,71,87,0.08);
+  border:1px solid rgba(255,71,87,0.2);
+  border-radius:var(--radius);
+  color:var(--danger);
+}
+
+.results-summary{
+  text-align:center;
+  margin-bottom:20px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+}
+.results-summary h3{font-size:1rem;margin-bottom:4px}
+.results-summary p{font-size:0.8rem;color:var(--text-muted)}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>SingCoach</h1>
+    <p>Sing along with the reference track, then get instant coaching feedback</p>
+  </header>
+
+  <!-- REFERENCE PLAYER -->
+  <div class="section">
+    <div class="section-label">Reference Track</div>
+    <div class="player-row">
+      <button class="play-btn" id="play-btn" onclick="togglePlay()">
+        <svg id="icon-play" viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg>
+        <svg id="icon-pause" viewBox="0 0 24 24" style="display:none"><rect x="5" y="4" width="4" height="16"/><rect x="15" y="4" width="4" height="16"/></svg>
+      </button>
+      <div class="progress-wrap">
+        <input type="range" class="progress-bar" id="progress" min="0" max="100" value="0" step="0.1" oninput="seekAudio(this.value)">
+        <div class="time-display"><span id="time-current">0:00</span> / <span id="time-total">0:00</span></div>
+      </div>
+    </div>
+    <div class="lyrics-panel" id="lyrics-panel"></div>
+  </div>
+
+  <!-- RECORD SECTION -->
+  <div class="section">
+    <div class="section-label">Your Turn</div>
+    <div class="record-area">
+      <button class="record-btn idle" id="record-btn" onclick="toggleRecord()">
+        <span id="record-btn-text">Record Yourself</span>
+      </button>
+      <div class="record-indicator" id="record-indicator">
+        <div class="red-dot"></div>
+        <span id="record-timer">0:00</span>
+        <span>&mdash; Recording...</span>
+      </div>
+      <div class="record-hint" id="record-hint">
+        Play the reference track first, then record yourself singing the same part
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="section" id="results-section">
+    <div class="section-label">Coaching Feedback</div>
+    <div id="results-container"></div>
+  </div>
+
+</div>
+
+<audio id="reference-audio" preload="auto"></audio>
+
+<script>
+// ===================== LYRICS DATA =====================
+const LYRICS = [
+  { start: 0.0,  end: 4.5,  text: "Walking down beneath the city lights" },
+  { start: 4.5,  end: 9.0,  text: "Feeling every shadow come alive" },
+  { start: 9.0,  end: 13.5, text: "The bridge above is calling out my name" },
+  { start: 13.5, end: 18.0, text: "Nothing here will ever be the same" },
+  { start: 18.0, end: 22.5, text: "I don't ever wanna feel" },
+  { start: 22.5, end: 27.0, text: "Like I did that day" },
+  { start: 27.0, end: 31.5, text: "Take me to the place I love" },
+  { start: 31.5, end: 36.0, text: "Take me all the way" },
+  { start: 36.0, end: 40.0, text: "Under the bridge downtown" },
+  { start: 40.0, end: 44.0, text: "Is where I drew some blood" },
+];
+
+// ===================== STATE =====================
+const state = {
+  isPlaying: false,
+  isRecording: false,
+  mediaRecorder: null,
+  audioChunks: [],
+  recordTimerInterval: null,
+  recordStartTime: null,
+};
+
+// ===================== INIT =====================
+const audio = document.getElementById('reference-audio');
+audio.src = '/reference';
+
+// Build lyrics DOM
+const lyricsPanel = document.getElementById('lyrics-panel');
+LYRICS.forEach((line, i) => {
+  const div = document.createElement('div');
+  div.className = 'lyrics-line';
+  div.id = 'lyric-' + i;
+  div.textContent = line.text;
+  lyricsPanel.appendChild(div);
+});
+
+// Audio events
+audio.addEventListener('loadedmetadata', () => {
+  document.getElementById('time-total').textContent = fmtTime(audio.duration);
+});
+
+audio.addEventListener('timeupdate', () => {
+  const t = audio.currentTime;
+  const d = audio.duration || 1;
+  document.getElementById('progress').value = (t / d) * 100;
+  document.getElementById('time-current').textContent = fmtTime(t);
+
+  LYRICS.forEach((line, i) => {
+    const el = document.getElementById('lyric-' + i);
+    if (t >= line.start && t < line.end) {
+      el.className = 'lyrics-line active';
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (t >= line.end) {
+      el.className = 'lyrics-line past';
+    } else {
+      el.className = 'lyrics-line';
+    }
+  });
+});
+
+audio.addEventListener('ended', () => {
+  state.isPlaying = false;
+  updatePlayIcon();
+});
+
+// ===================== PLAYER CONTROLS =====================
+function togglePlay() {
+  if (state.isPlaying) {
+    audio.pause();
+  } else {
+    audio.play();
+  }
+  state.isPlaying = !state.isPlaying;
+  updatePlayIcon();
+}
+
+function updatePlayIcon() {
+  document.getElementById('icon-play').style.display = state.isPlaying ? 'none' : 'block';
+  document.getElementById('icon-pause').style.display = state.isPlaying ? 'block' : 'none';
+}
+
+function seekAudio(val) {
+  if (audio.duration) {
+    audio.currentTime = (val / 100) * audio.duration;
+  }
+}
+
+function fmtTime(s) {
+  if (!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+// ===================== RECORDING =====================
+async function toggleRecord() {
+  if (state.isRecording) {
+    stopRecording();
+  } else {
+    await startRecording();
+  }
+}
+
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        sampleRate: 44100,
+      }
+    });
+
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+      ? 'audio/webm;codecs=opus'
+      : 'audio/webm';
+
+    state.mediaRecorder = new MediaRecorder(stream, { mimeType });
+    state.audioChunks = [];
+
+    state.mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) state.audioChunks.push(e.data);
+    };
+
+    state.mediaRecorder.onstop = () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(state.audioChunks, { type: mimeType });
+      submitForAnalysis(blob);
+    };
+
+    state.mediaRecorder.start(100);
+    state.isRecording = true;
+    state.recordStartTime = Date.now();
+
+    // Update UI
+    const btn = document.getElementById('record-btn');
+    btn.className = 'record-btn recording';
+    document.getElementById('record-btn-text').textContent = 'Stop Recording';
+    document.getElementById('record-indicator').classList.add('visible');
+    document.getElementById('record-hint').style.display = 'none';
+
+    // Timer
+    state.recordTimerInterval = setInterval(() => {
+      const elapsed = (Date.now() - state.recordStartTime) / 1000;
+      document.getElementById('record-timer').textContent = fmtTime(elapsed);
+    }, 200);
+
+  } catch (err) {
+    alert('Microphone access is required. Please allow microphone access and try again.');
+  }
+}
+
+function stopRecording() {
+  if (state.mediaRecorder && state.isRecording) {
+    state.mediaRecorder.stop();
+    state.isRecording = false;
+
+    clearInterval(state.recordTimerInterval);
+
+    const btn = document.getElementById('record-btn');
+    btn.className = 'record-btn idle';
+    btn.disabled = true;
+    document.getElementById('record-btn-text').textContent = 'Analyzing...';
+    document.getElementById('record-indicator').classList.remove('visible');
+  }
+}
+
+// ===================== ANALYSIS SUBMISSION =====================
+async function submitForAnalysis(blob) {
+  showLoading();
+
+  const formData = new FormData();
+  formData.append('user_audio', blob, 'recording.webm');
+
+  try {
+    const response = await fetch('/analyze', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ detail: 'Server error' }));
+      throw new Error(err.detail || 'Analysis failed');
+    }
+
+    const items = await response.json();
+    renderFeedback(items);
+
+  } catch (err) {
+    showError(err.message);
+  } finally {
+    resetRecordButton();
+  }
+}
+
+// ===================== RESULTS RENDERING =====================
+function showLoading() {
+  const section = document.getElementById('results-section');
+  section.style.display = 'block';
+  document.getElementById('results-container').innerHTML = `
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Analyzing your recording...</p>
+      <p class="detail">Extracting pitch, energy, and timing features</p>
+    </div>`;
+  section.scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderFeedback(items) {
+  const container = document.getElementById('results-container');
+
+  if (!items || items.length === 0) {
+    container.innerHTML = `
+      <div class="success-card">
+        <h3>Great job!</h3>
+        <p>No major issues detected. Your singing closely matches the reference track.</p>
+      </div>`;
+    return;
+  }
+
+  items.sort((a, b) => a.timestamp_start - b.timestamp_start);
+
+  const metricLabels = {
+    pitch_flat: 'Pitch (Flat)',
+    pitch_sharp: 'Pitch (Sharp)',
+    energy_drop: 'Breath Support',
+    energy_low: 'Volume',
+    timing_drift: 'Timing',
+  };
+
+  let summaryHtml = `
+    <div class="results-summary">
+      <h3>${items.length} coaching note${items.length !== 1 ? 's' : ''}</h3>
+      <p>Review each item below for specific guidance</p>
+    </div>`;
+
+  let cardsHtml = items.map(item => `
+    <div class="feedback-card" data-metric="${item.metric}">
+      <div class="feedback-header">
+        <span class="timestamp">${fmtTime(item.timestamp_start)} &ndash; ${fmtTime(item.timestamp_end)}</span>
+        <span class="metric-badge ${item.metric}">${metricLabels[item.metric] || item.metric}</span>
+        <span class="delta-value">${item.delta}</span>
+      </div>
+      <div class="lyric-quote">&ldquo;${item.lyric_snippet}&rdquo;</div>
+      <div class="feedback-text">${item.feedback}</div>
+    </div>`).join('');
+
+  container.innerHTML = summaryHtml + cardsHtml;
+}
+
+function showError(message) {
+  document.getElementById('results-container').innerHTML = `
+    <div class="error-card">
+      <p><strong>Analysis failed</strong></p>
+      <p>${message}</p>
+    </div>`;
+}
+
+function resetRecordButton() {
+  const btn = document.getElementById('record-btn');
+  btn.disabled = false;
+  btn.className = 'record-btn idle';
+  document.getElementById('record-btn-text').textContent = 'Record Again';
+  document.getElementById('record-hint').style.display = 'block';
+  document.getElementById('record-hint').textContent = 'Try again to improve your score';
+}
+</script>
+</body>
+</html>
