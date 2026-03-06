@@ -291,16 +291,123 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
 .loading-state p{color:var(--text-secondary);font-size:0.9rem}
 .loading-state .detail{color:var(--text-muted);font-size:0.8rem;margin-top:4px}
 
-.success-card{
-  text-align:center;
-  padding:32px 20px;
-  background:rgba(46,213,115,0.08);
-  border:1px solid rgba(46,213,115,0.2);
-  border-radius:var(--radius);
+/* --- SCORE GAUGES --- */
+.scores-dashboard{margin-bottom:28px}
+.score-main{display:flex;justify-content:center;margin-bottom:20px}
+.score-gauge{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
-.success-card h3{color:var(--success);font-size:1.1rem;margin-bottom:8px}
-.success-card p{color:var(--text-secondary);font-size:0.9rem}
+.score-ring{
+  position:relative;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.score-ring-bg{
+  position:absolute;
+  border-radius:50%;
+  background:var(--bg-card);
+}
+.score-value{
+  position:relative;z-index:1;
+  font-weight:700;
+  line-height:1;
+}
+.score-label{
+  font-size:0.7rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  color:var(--text-muted);
+  margin-top:8px;
+}
+.score-main .score-ring{width:120px;height:120px}
+.score-main .score-ring-bg{width:96px;height:96px;top:12px;left:12px}
+.score-main .score-value{font-size:2rem}
+.score-main .score-label{font-size:0.8rem}
 
+.scores-row{
+  display:flex;
+  justify-content:center;
+  gap:24px;
+  flex-wrap:wrap;
+}
+.scores-row .score-ring{width:80px;height:80px}
+.scores-row .score-ring-bg{width:64px;height:64px;top:8px;left:8px}
+.scores-row .score-value{font-size:1.2rem}
+
+/* --- SUMMARY --- */
+.summary-panel{margin-bottom:24px}
+.summary-group{margin-bottom:14px}
+.summary-group-label{
+  font-size:0.7rem;font-weight:600;text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:8px;
+}
+.summary-group-label.strengths{color:var(--success)}
+.summary-group-label.work-on{color:var(--warning)}
+.summary-item{
+  font-size:0.85rem;
+  color:var(--text-secondary);
+  padding:8px 14px;
+  background:var(--bg-card);
+  border-radius:8px;
+  margin-bottom:6px;
+  line-height:1.5;
+}
+.summary-item.strength{border-left:3px solid var(--success)}
+.summary-item.weakness{border-left:3px solid var(--warning)}
+
+/* --- EXERCISES --- */
+.exercises-panel{margin-bottom:24px}
+.exercise-card{
+  background:var(--bg-card);
+  border-radius:var(--radius);
+  padding:16px 20px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition:background 0.2s;
+}
+.exercise-card:hover{background:var(--bg-card-hover)}
+.exercise-header{
+  display:flex;align-items:center;gap:10px;
+}
+.priority-badge{
+  width:24px;height:24px;
+  border-radius:50%;
+  background:var(--accent);
+  color:#fff;
+  font-size:0.7rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.exercise-name{font-weight:600;font-size:0.95rem;flex:1}
+.exercise-target{
+  font-size:0.65rem;font-weight:600;text-transform:uppercase;
+  letter-spacing:0.5px;padding:2px 8px;border-radius:10px;
+  background:rgba(108,92,231,0.15);color:var(--accent-light);
+}
+.exercise-toggle{
+  color:var(--text-muted);font-size:0.8rem;transition:transform 0.2s;
+}
+.exercise-card.open .exercise-toggle{transform:rotate(180deg)}
+.exercise-body{
+  display:none;
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid var(--border);
+}
+.exercise-card.open .exercise-body{display:block}
+.exercise-desc{font-size:0.85rem;color:var(--text-secondary);margin-bottom:8px;line-height:1.5}
+.exercise-why{
+  font-size:0.8rem;color:var(--text-muted);
+  padding:8px 12px;background:var(--bg-primary);border-radius:6px;
+  line-height:1.5;
+}
+.exercise-why strong{color:var(--text-secondary)}
+
+/* --- ENHANCED FEEDBACK CARDS --- */
 .feedback-card{
   background:var(--bg-card);
   border-left:4px solid var(--accent);
@@ -336,12 +443,43 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
 .metric-badge.timing_drift{
   background:rgba(162,155,254,0.15);color:var(--accent-light);
 }
+.severity-badge{
+  font-size:0.65rem;font-weight:600;text-transform:uppercase;
+  letter-spacing:0.5px;padding:2px 8px;border-radius:10px;
+}
+.severity-badge.mild{background:rgba(46,213,115,0.15);color:var(--success)}
+.severity-badge.moderate{background:rgba(255,165,2,0.15);color:var(--warning)}
+.severity-badge.severe{background:rgba(255,71,87,0.15);color:var(--danger)}
 .delta-value{font-size:0.75rem;color:var(--text-muted);margin-left:auto}
 .lyric-quote{
   font-style:italic;color:var(--text-secondary);font-size:0.85rem;
   margin-bottom:8px;padding-left:12px;border-left:2px solid var(--border);
 }
-.feedback-text{font-size:0.9rem;color:var(--text-primary);line-height:1.5}
+.feedback-text{font-size:0.9rem;color:var(--text-primary);line-height:1.5;margin-bottom:8px}
+.feedback-why{
+  font-size:0.8rem;color:var(--text-muted);line-height:1.5;
+  margin-bottom:8px;
+}
+.feedback-tip{
+  font-size:0.8rem;
+  padding:8px 12px;
+  background:rgba(108,92,231,0.08);
+  border:1px solid rgba(108,92,231,0.2);
+  border-radius:6px;
+  color:var(--accent-light);
+  line-height:1.5;
+}
+.feedback-tip strong{color:var(--accent-light)}
+
+.success-card{
+  text-align:center;
+  padding:32px 20px;
+  background:rgba(46,213,115,0.08);
+  border:1px solid rgba(46,213,115,0.2);
+  border-radius:var(--radius);
+}
+.success-card h3{color:var(--success);font-size:1.1rem;margin-bottom:8px}
+.success-card p{color:var(--text-secondary);font-size:0.9rem}
 
 .error-card{
   text-align:center;padding:24px;
@@ -353,6 +491,58 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
 }
 .results-summary h3{font-size:1rem;margin-bottom:4px}
 .results-summary p{font-size:0.8rem;color:var(--text-muted)}
+
+/* --- SESSION HISTORY --- */
+.history-panel{margin-top:8px}
+.history-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.history-header h4{font-size:0.85rem;color:var(--text-secondary)}
+.clear-history-btn{
+  font-size:0.7rem;
+  padding:4px 10px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  background:none;
+  color:var(--text-muted);
+  cursor:pointer;
+  font-family:inherit;
+}
+.clear-history-btn:hover{color:var(--danger);border-color:var(--danger)}
+.history-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.75rem;
+}
+.history-table th{
+  padding:8px 6px;
+  text-align:center;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  color:var(--text-muted);
+  font-size:0.65rem;
+  border-bottom:1px solid var(--border);
+}
+.history-table td{
+  padding:8px 6px;
+  text-align:center;
+  color:var(--text-secondary);
+  border-bottom:1px solid rgba(45,45,68,0.5);
+}
+.history-table tr:last-child td{border-bottom:none}
+.score-cell{font-weight:600;font-variant-numeric:tabular-nums}
+.score-cell.high{color:var(--success)}
+.score-cell.mid{color:var(--warning)}
+.score-cell.low{color:var(--danger)}
+.trend-up{color:var(--success);font-size:0.7rem}
+.trend-down{color:var(--danger);font-size:0.7rem}
+.trend-same{color:var(--text-muted);font-size:0.7rem}
+.history-empty{
+  text-align:center;padding:20px;
+  color:var(--text-muted);font-size:0.8rem;font-style:italic;
+}
 </style>
 </head>
 <body>
@@ -420,6 +610,12 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
     <div id="results-container"></div>
   </div>
 
+  <!-- SESSION HISTORY -->
+  <div class="section" id="history-section" style="display:none">
+    <div class="section-label">Session History</div>
+    <div id="history-container"></div>
+  </div>
+
 </div>
 
 <audio id="reference-audio" preload="auto"></audio>
@@ -427,6 +623,7 @@ header p{color:var(--text-secondary);font-size:0.9rem;margin-top:6px}
 <script>
 // ===================== STATE =====================
 let LYRICS = [];
+let currentReferenceName = 'default';
 const state = {
   isPlaying: false,
   isRecording: false,
@@ -469,7 +666,6 @@ function renderLyricsPanel() {
   });
 }
 
-// Load lyrics on page load
 loadLyrics();
 
 // ===================== AUDIO EVENTS =====================
@@ -561,20 +757,17 @@ async function handleRefUpload(input) {
     }
     const data = await resp.json();
 
-    // Update lyrics from server response
     LYRICS = data.lyrics || [];
     renderLyricsPanel();
 
-    // Reload audio element
     audio.src = '/reference?t=' + Date.now();
     audio.load();
     state.hasListened = false;
     setStep(1);
+    currentReferenceName = file.name;
 
     status.textContent = data.message || 'Reference updated';
     document.getElementById('reset-btn').style.display = 'inline-block';
-
-    // Hide results from previous analysis
     document.getElementById('results-section').style.display = 'none';
 
   } catch (err) {
@@ -599,6 +792,7 @@ async function resetReference() {
     audio.load();
     state.hasListened = false;
     setStep(1);
+    currentReferenceName = 'default';
 
     status.textContent = 'Reset to default track';
     document.getElementById('reset-btn').style.display = 'none';
@@ -619,7 +813,6 @@ async function toggleRecord() {
 }
 
 async function startRecording() {
-  // Pause reference if playing
   if (state.isPlaying) {
     audio.pause();
     state.isPlaying = false;
@@ -698,8 +891,8 @@ async function submitForAnalysis(blob) {
       throw new Error(err.detail || 'Analysis failed');
     }
 
-    const items = await response.json();
-    renderFeedback(items);
+    const data = await response.json();
+    renderResults(data);
 
   } catch (err) {
     showError(err.message);
@@ -708,7 +901,7 @@ async function submitForAnalysis(blob) {
   }
 }
 
-// ===================== RESULTS =====================
+// ===================== RESULTS RENDERING =====================
 function showLoading() {
   const section = document.getElementById('results-section');
   section.style.display = 'block';
@@ -716,21 +909,155 @@ function showLoading() {
     <div class="loading-state">
       <div class="spinner"></div>
       <p>Analyzing your recording...</p>
-      <p class="detail">Extracting pitch, energy, and timing features</p>
+      <p class="detail">Extracting pitch, energy, timing, and voice similarity</p>
     </div>`;
   section.scrollIntoView({ behavior: 'smooth' });
 }
 
-function renderFeedback(items) {
+function renderResults(data) {
   const container = document.getElementById('results-container');
+  let html = '';
 
+  // 1. Score Dashboard
+  if (data.scores) {
+    html += renderScores(data.scores);
+  }
+
+  // 2. Summary
+  if (data.summary) {
+    html += renderSummary(data.summary);
+  }
+
+  // 3. Exercises
+  if (data.exercises && data.exercises.length > 0) {
+    html += renderExercises(data.exercises);
+  }
+
+  // 4. Feedback Cards
+  if (data.feedback) {
+    html += renderFeedback(data.feedback);
+  }
+
+  container.innerHTML = html;
+
+  // Attach exercise toggle handlers
+  container.querySelectorAll('.exercise-card').forEach(card => {
+    card.querySelector('.exercise-header').addEventListener('click', () => {
+      card.classList.toggle('open');
+    });
+  });
+
+  // Save session and render history
+  if (data.scores) {
+    saveSession(data.scores, data.exercises ? data.exercises.length : 0);
+    renderHistory();
+  }
+}
+
+function scoreColor(score) {
+  if (score >= 80) return 'var(--success)';
+  if (score >= 60) return 'var(--warning)';
+  return 'var(--danger)';
+}
+
+function scoreColorClass(score) {
+  if (score >= 80) return 'high';
+  if (score >= 60) return 'mid';
+  return 'low';
+}
+
+function renderScores(scores) {
+  function gauge(score, size) {
+    const color = scoreColor(score);
+    const deg = (score / 100) * 360;
+    const bg = `conic-gradient(${color} ${deg}deg, var(--border) ${deg}deg)`;
+    return `background:${bg};`;
+  }
+
+  return `
+    <div class="scores-dashboard">
+      <div class="score-main">
+        <div class="score-gauge">
+          <div class="score-ring" style="${gauge(scores.overall)}">
+            <div class="score-ring-bg"></div>
+            <span class="score-value" style="color:${scoreColor(scores.overall)}">${scores.overall}</span>
+          </div>
+          <span class="score-label">Overall</span>
+        </div>
+      </div>
+      <div class="scores-row">
+        ${['similarity', 'pitch', 'energy', 'timing'].map(key => {
+          const labels = { similarity: 'Similarity', pitch: 'Pitch', energy: 'Energy', timing: 'Timing' };
+          return `
+          <div class="score-gauge">
+            <div class="score-ring" style="${gauge(scores[key])}">
+              <div class="score-ring-bg"></div>
+              <span class="score-value" style="color:${scoreColor(scores[key])}">${scores[key]}</span>
+            </div>
+            <span class="score-label">${labels[key]}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+function renderSummary(summary) {
+  let html = '<div class="summary-panel">';
+
+  if (summary.strengths && summary.strengths.length) {
+    html += '<div class="summary-group">';
+    html += '<div class="summary-group-label strengths">Strengths</div>';
+    summary.strengths.forEach(s => {
+      html += `<div class="summary-item strength">${s}</div>`;
+    });
+    html += '</div>';
+  }
+
+  if (summary.work_on && summary.work_on.length) {
+    html += '<div class="summary-group">';
+    html += '<div class="summary-group-label work-on">Areas to Work On</div>';
+    summary.work_on.forEach(w => {
+      html += `<div class="summary-item weakness">${w}</div>`;
+    });
+    html += '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function renderExercises(exercises) {
+  let html = '<div class="exercises-panel">';
+  html += '<div class="section-label" style="margin-bottom:12px">Recommended Exercises</div>';
+
+  exercises.forEach(ex => {
+    const targetLabels = { pitch: 'Pitch', energy: 'Breath', timing: 'Timing', similarity: 'Tone' };
+    html += `
+    <div class="exercise-card">
+      <div class="exercise-header">
+        <span class="priority-badge">${ex.priority}</span>
+        <span class="exercise-name">${ex.name}</span>
+        <span class="exercise-target">${targetLabels[ex.target] || ex.target}</span>
+        <span class="exercise-toggle">&#9660;</span>
+      </div>
+      <div class="exercise-body">
+        <div class="exercise-desc">${ex.description}</div>
+        <div class="exercise-why"><strong>Why this helps:</strong> ${ex.why}</div>
+      </div>
+    </div>`;
+  });
+
+  html += '</div>';
+  return html;
+}
+
+function renderFeedback(items) {
   if (!items || items.length === 0) {
-    container.innerHTML = `
+    return `
       <div class="success-card">
         <h3>Great job!</h3>
         <p>No major issues detected. Your singing closely matches the reference track.</p>
       </div>`;
-    return;
   }
 
   items.sort((a, b) => a.timestamp_start - b.timestamp_start);
@@ -743,25 +1070,35 @@ function renderFeedback(items) {
   let html = `
     <div class="results-summary">
       <h3>${items.length} coaching note${items.length !== 1 ? 's' : ''}</h3>
-      <p>Review each item below for specific guidance</p>
+      <p>Detailed feedback for each section</p>
     </div>`;
 
   html += items.map(item => {
     const lyricHtml = item.lyric_snippet
       ? `<div class="lyric-quote">&ldquo;${item.lyric_snippet}&rdquo;</div>` : '';
+    const severityHtml = item.severity
+      ? `<span class="severity-badge ${item.severity}">${item.severity}</span>` : '';
+    const whyHtml = item.why
+      ? `<div class="feedback-why">${item.why}</div>` : '';
+    const tipHtml = item.tip
+      ? `<div class="feedback-tip"><strong>Quick tip:</strong> ${item.tip}</div>` : '';
+
     return `
     <div class="feedback-card" data-metric="${item.metric}">
       <div class="feedback-header">
         <span class="timestamp">${fmtTime(item.timestamp_start)} &ndash; ${fmtTime(item.timestamp_end)}</span>
         <span class="metric-badge ${item.metric}">${metricLabels[item.metric] || item.metric}</span>
+        ${severityHtml}
         <span class="delta-value">${item.delta}</span>
       </div>
       ${lyricHtml}
       <div class="feedback-text">${item.feedback}</div>
+      ${whyHtml}
+      ${tipHtml}
     </div>`;
   }).join('');
 
-  container.innerHTML = html;
+  return html;
 }
 
 function showError(message) {
@@ -778,8 +1115,96 @@ function resetRecordButton() {
   btn.className = 'record-btn idle';
   document.getElementById('record-btn-text').textContent = 'Record Again';
   document.getElementById('record-hint').style.display = 'block';
-  document.getElementById('record-hint').textContent = 'Try again to improve your performance';
+  document.getElementById('record-hint').textContent = 'Try again to improve your scores';
 }
+
+// ===================== SESSION HISTORY =====================
+const HISTORY_KEY = 'singcoach_sessions';
+
+function saveSession(scores, exerciseCount) {
+  const sessions = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+  sessions.unshift({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    date: new Date().toISOString(),
+    reference: currentReferenceName,
+    scores: scores,
+    exerciseCount: exerciseCount,
+  });
+  // Keep last 50 sessions
+  if (sessions.length > 50) sessions.length = 50;
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(sessions));
+}
+
+function loadSessions() {
+  return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+}
+
+function clearHistory() {
+  localStorage.removeItem(HISTORY_KEY);
+  renderHistory();
+}
+
+function renderHistory() {
+  const sessions = loadSessions();
+  const section = document.getElementById('history-section');
+  const container = document.getElementById('history-container');
+
+  if (sessions.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+
+  let html = `
+    <div class="history-panel">
+      <div class="history-header">
+        <h4>${sessions.length} session${sessions.length !== 1 ? 's' : ''} recorded</h4>
+        <button class="clear-history-btn" onclick="clearHistory()">Clear History</button>
+      </div>
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Overall</th>
+            <th>Similarity</th>
+            <th>Pitch</th>
+            <th>Energy</th>
+            <th>Timing</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+  sessions.slice(0, 20).forEach((sess, idx) => {
+    const d = new Date(sess.date);
+    const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      + ' ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+    const prev = sessions[idx + 1];
+
+    const scoreKeys = ['overall', 'similarity', 'pitch', 'energy', 'timing'];
+    const cells = scoreKeys.map(key => {
+      const val = sess.scores[key];
+      const cls = scoreColorClass(val);
+      let trend = '';
+      if (prev && prev.scores[key] !== undefined) {
+        const diff = val - prev.scores[key];
+        if (diff > 2) trend = ' <span class="trend-up">&#9650;</span>';
+        else if (diff < -2) trend = ' <span class="trend-down">&#9660;</span>';
+        else trend = ' <span class="trend-same">&#9644;</span>';
+      }
+      return `<td class="score-cell ${cls}">${val}${trend}</td>`;
+    }).join('');
+
+    html += `<tr><td>${dateStr}</td>${cells}</tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
+}
+
+// Load history on page load
+renderHistory();
 </script>
 </body>
 </html>

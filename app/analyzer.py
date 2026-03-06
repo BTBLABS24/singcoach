@@ -32,6 +32,16 @@ class SegmentAnalysis:
     lyric_snippet: Optional[str] = None
 
 
+@dataclass
+class ComparisonResult:
+    """Full comparison result with segments and aggregate scores."""
+    segments: List[SegmentAnalysis]
+    similarity_score: float          # 0.0-1.0, MFCC cosine similarity
+    pitch_scores: List[float]        # Per-segment pitch accuracy (0-1)
+    energy_scores: List[float]       # Per-segment energy accuracy (0-1)
+    timing_scores: List[float]       # Per-segment timing accuracy (0-1)
+
+
 class AudioAnalyzer:
     """
     Compares a reference singing recording to a user recording.
@@ -221,7 +231,53 @@ class AudioAnalyzer:
 
         return segments
 
-    def compare(self, reference_path: str, user_path: str) -> List[SegmentAnalysis]:
+    def _compute_similarity(
+        self,
+        ref_mfcc: np.ndarray,
+        user_mfcc: np.ndarray,
+        ref_idx: np.ndarray,
+        user_idx: np.ndarray,
+    ) -> float:
+        """Compute timbral similarity using cosine similarity of DTW-aligned MFCC frames."""
+        ref_frames = ref_mfcc[ref_idx]
+        user_frames = user_mfcc[user_idx]
+
+        # Cosine similarity per aligned pair
+        dot = np.sum(ref_frames * user_frames, axis=1)
+        ref_norm = np.linalg.norm(ref_frames, axis=1)
+        user_norm = np.linalg.norm(user_frames, axis=1)
+
+        denom = ref_norm * user_norm
+        valid = denom > 1e-8
+        if not np.any(valid):
+            return 0.0
+
+        similarities = dot[valid] / denom[valid]
+        # Cosine similarity is in [-1, 1]; map to [0, 1]
+        similarities = (similarities + 1.0) / 2.0
+        return float(np.mean(similarities))
+
+    def _compute_per_segment_scores(
+        self, segments: List[SegmentAnalysis]
+    ) -> tuple:
+        """Compute normalized 0-1 scores per segment for pitch, energy, timing."""
+        pitch_scores = []
+        energy_scores = []
+        timing_scores = []
+
+        for seg in segments:
+            pitch_scores.append(max(0.0, 1.0 - abs(seg.pitch_delta_cents) / 100.0))
+
+            e_score = min(1.0, seg.energy_ratio)
+            if seg.energy_drop_mid_phrase:
+                e_score *= 0.7
+            energy_scores.append(e_score)
+
+            timing_scores.append(max(0.0, 1.0 - abs(seg.timing_drift_ms) / 500.0))
+
+        return pitch_scores, energy_scores, timing_scores
+
+    def compare(self, reference_path: str, user_path: str) -> ComparisonResult:
         ref_y = self._load_audio(reference_path)
         user_y = self._load_audio(user_path)
 
@@ -242,15 +298,29 @@ class AudioAnalyzer:
 
         ref_pitch = ref_pitch[:ref_len]
         ref_energy = ref_energy[:ref_len]
+        ref_mfcc = ref_mfcc[:ref_len]
 
         user_pitch = user_pitch[:user_len]
         user_energy = user_energy[:user_len]
+        user_mfcc = user_mfcc[:user_len]
 
         ref_idx = np.clip(ref_idx, 0, ref_len - 1)
         user_idx = np.clip(user_idx, 0, user_len - 1)
 
-        return self._segment_by_windows(
+        similarity = self._compute_similarity(ref_mfcc, user_mfcc, ref_idx, user_idx)
+
+        segments = self._segment_by_windows(
             ref_idx, user_idx,
             ref_pitch, user_pitch,
             ref_energy, user_energy,
+        )
+
+        pitch_scores, energy_scores, timing_scores = self._compute_per_segment_scores(segments)
+
+        return ComparisonResult(
+            segments=segments,
+            similarity_score=round(similarity, 4),
+            pitch_scores=[round(s, 4) for s in pitch_scores],
+            energy_scores=[round(s, 4) for s in energy_scores],
+            timing_scores=[round(s, 4) for s in timing_scores],
         )

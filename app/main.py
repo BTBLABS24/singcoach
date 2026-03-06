@@ -155,12 +155,12 @@ async def analyze(user_audio: UploadFile = File(...)):
         tmp_path = tmp.name
 
     try:
-        segments = analyzer.compare(
+        result = analyzer.compare(
             reference_path=current_reference_path,
             user_path=tmp_path,
         )
-        feedback_items = coach.generate_feedback(segments, lyrics=current_lyrics)
-        return JSONResponse(content=feedback_items)
+        coaching = coach.generate_coaching(result, lyrics=current_lyrics)
+        return JSONResponse(content=coaching)
 
     except Exception as e:
         logger.exception("Analysis failed")
